@@ -199,31 +199,47 @@ namespace HM.PdfOcr
                                  XGraphics gfx = XGraphics.FromPdfPage(xPage);
                                  if (drawImage)
                                  {
-                                     gfx.BeginMarkedContentPropList("oc1");
-                                     //var font = new XFont("微软雅黑", 10, XFontStyle.Regular);
+                                     if (false)
+                                     {
+                                         gfx.BeginMarkedContentPropList("oc1");
+                                         //var font = new XFont("微软雅黑", 10, XFontStyle.Regular);
+                                         foreach (PaddleOcrResultRegion region in result.Regions)
+                                         {
+                                             var center = region.Rect.Center;
+                                             var rect = region.Rect.BoundingRect();//rect.Y + rect.Height / 2
+                                             var size = ConvertToPDFSize(new RectangleF(rect.X, center.Y + rect.Height / 4, rect.Width, rect.Height), dpiX, dpiY, rotate, flags);
+                                             #region 字体等比例放大不适用
+                                             //var width = size.Width;
+                                             //var height = size.Height;
+                                             //var textSize = gfx.MeasureString(region.Text, font);
+                                             //var scale = Math.Min(width / textSize.Width, height / textSize.Height);
+                                             //gfx.ScaleTransform(scale, scale,XMatrixOrder.Prepend);
+                                             #endregion
+                                             var font = GetFont(region.Text, gfx, size.Width, size.Height);
+                                             gfx.DrawString(region.Text, font, XBrushes.Black, size.X, size.Y);
+                                         }
+
+                                         gfx.EndMarkedContent();
+                                         
+                                         PdfResources rsx = (xPage.Elements["/Resources"] as PdfResources);
+                                         rsx.AddOCG("oc1", "Layer 1");
+
+                                     }
+
+                                     gfx.DrawImage(image, 0, 0, pdfWidth, pdfHeight);
+
                                      foreach (PaddleOcrResultRegion region in result.Regions)
                                      {
                                          var center = region.Rect.Center;
                                          var rect = region.Rect.BoundingRect();//rect.Y + rect.Height / 2
                                          var size = ConvertToPDFSize(new RectangleF(rect.X, center.Y + rect.Height / 4, rect.Width, rect.Height), dpiX, dpiY, rotate, flags);
-                                         #region 字体等比例放大不适用
-                                         //var width = size.Width;
-                                         //var height = size.Height;
-                                         //var textSize = gfx.MeasureString(region.Text, font);
-                                         //var scale = Math.Min(width / textSize.Width, height / textSize.Height);
-                                         //gfx.ScaleTransform(scale, scale,XMatrixOrder.Prepend);
-                                         #endregion
                                          var font = GetFont(region.Text, gfx, size.Width, size.Height);
                                          gfx.DrawString(region.Text, font, XBrushes.Black, size.X, size.Y);
                                      }
-
-                                     gfx.EndMarkedContent();
-                                     PdfResources rsx = (xPage.Elements["/Resources"] as PdfResources);
-                                     rsx.AddOCG("oc1", "Layer 1");
-                                     gfx.DrawImage(image, 0, 0, pdfWidth, pdfHeight);
                                  }
                                  else
                                  {
+
                                      foreach (PaddleOcrResultRegion region in result.Regions)
                                      {
                                          var center = region.Rect.Center;
