@@ -342,7 +342,7 @@ namespace HM.PdfOcr
         private PaddleOcrResult OcrImage(Image image)
         {
             byte[] sampleImageData = ImageToByte(image);
-            FullOcrModel model = LocalFullModels.ChineseV3;
+            FullOcrModel model = LocalFullModels.ChineseV4;
             using (PaddleOcrAll all = new PaddleOcrAll(model, PaddleDevice.Mkldnn())
             {
                 AllowRotateDetection = true, /* 允许识别有角度的文字 */
